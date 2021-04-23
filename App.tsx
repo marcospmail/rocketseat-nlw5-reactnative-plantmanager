@@ -7,6 +7,7 @@ import {
 import AppLoading from 'expo-app-loading';
 
 import Routes from './src/routes';
+import { StatusBar } from 'expo-status-bar';
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -19,6 +20,9 @@ export default function App() {
   }
 
   return (
-    <Routes />
+    <>
+       <StatusBar style="dark" backgroundColor="white" translucent={false} /> 
+      <Routes />
+    </>
   )
 }
