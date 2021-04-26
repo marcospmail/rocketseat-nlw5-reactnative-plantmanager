@@ -9,6 +9,10 @@ import AppLoading from 'expo-app-loading';
 import Routes from './src/routes';
 import { StatusBar } from 'expo-status-bar';
 
+if(__DEV__) {
+  import('./src/ReactotronConfig').then(() => console.log('Reactotron Configured'))
+}
+
 export default function App() {
   const [fontsLoaded] = useFonts({
     Jost_400Regular,

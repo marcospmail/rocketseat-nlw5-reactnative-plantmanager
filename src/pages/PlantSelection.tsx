@@ -1,13 +1,16 @@
+import { useNavigation } from '@react-navigation/native'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView, ActivityIndicator, StyleSheet, View, Text } from 'react-native'
 import { FlatList } from 'react-native-gesture-handler'
 import EnvironmentButton from '../components/EnvironmentButton'
 
+import { PlantProps } from '../lib/storage'
+
+import api from '../services/api'
+
 import Header from '../components/Header'
 import Load from '../components/Load'
 import PlantCardPrimary from '../components/PlantCardPrimary'
-
-import api from '../services/api'
 
 import colors from '../styles/colors'
 import fonts from '../styles/fonts'
@@ -17,24 +20,13 @@ interface EnvinromentProps {
   title: string
 }
 
-interface PlantsProps {
-  id: number,
-  name: string,
-  about: string
-  water_tips: string
-  photo: string
-  environments: string[]
-  frequency: {
-    times: number,
-    repeat_every: string
-  }
-}
-
 function PlantSelection() {
+  const navigation = useNavigation()
+
   const [environments, setEnvironments] = useState<EnvinromentProps[]>([])
-  const [plants, setPlants] = useState<PlantsProps[]>([])
+  const [plants, setPlants] = useState<PlantProps[]>([])
   const [environmentSelected, setEnvironmentSelected] = useState('all')
-  const [filteredPlants, setFilteredPlants] = useState<PlantsProps[]>([])
+  const [filteredPlants, setFilteredPlants] = useState<PlantProps[]>([])
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
   const [loadingMore, setLoadingMore] = useState(true)
@@ -46,6 +38,7 @@ function PlantSelection() {
       setEnvironments([
         {
           key: 'all',
+
           title: 'Todos'
         },
         ...data
@@ -63,9 +56,7 @@ function PlantSelection() {
   }, [page])
 
   async function fetchPlants() {
-    console.log({ page })
-
-    const { data } = await api.get<PlantsProps[]>(`plants?_sort=name&_order=asc&_page=${page}&_limit=6`)
+    const { data } = await api.get<PlantProps[]>(`plants?_sort=name&_order=asc&_page=${page}&_limit=6`)
 
     if (!data.length) {
       setLoadedAll(true)
@@ -83,8 +74,6 @@ function PlantSelection() {
     if (loadingMore || distanceFromEnd < 1) {
       return
     }
-
-    console.log('loading more...')
 
     setLoadingMore(true)
 
@@ -108,6 +97,10 @@ function PlantSelection() {
       plant.environments.includes(environmentKey))
 
     setFilteredPlants(filteredPlants)
+  }
+
+  function handleOnPlantSelect(plant: PlantsProps) {
+    navigation.navigate('PlantSave', { plant })
   }
 
   if (loading) {
@@ -151,8 +144,10 @@ function PlantSelection() {
         <FlatList
           data={filteredPlants}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }: { item: PlantsProps }) => (
-            <PlantCardPrimary data={item} />
+          renderItem={({ item }: { item: PlantProps }) => (
+            <PlantCardPrimary data={item}
+              onPress={() => { handleOnPlantSelect(item) }}
+            />
           )}
           showsVerticalScrollIndicator={false}
           numColumns={2}
@@ -162,7 +157,7 @@ function PlantSelection() {
             loadingMore ? (
               <ActivityIndicator color={colors.green_dark} />
             ) : <View style={{ height: 20 }} />}
-            />
+        />
       </View>
 
     </SafeAreaView >
@@ -170,38 +165,36 @@ function PlantSelection() {
 }
 
 const styles = StyleSheet.create({
-          container: {
-          flex: 1,
-    paddingHorizontal: 20
+  container: {
+    flex: 1,
+    paddingHorizontal: 20,
+    backgroundColor: colors.white
   },
-  header: {
-
-        },
   title: {
-          fontSize: 22,
+    fontSize: 22,
     fontFamily: fonts.heading,
     color: colors.heading,
     lineHeight: 38,
     marginTop: 15
   },
   subtitle: {
-          fontFamily: fonts.text,
+    fontFamily: fonts.text,
     fontSize: 17,
     lineHeight: 20,
     color: colors.heading
   },
   button: {
-          width: '100%',
+    width: '100%',
     marginTop: 20
   },
   environmentList: {
-          height: 40,
+    height: 40,
     justifyContent: 'center',
     paddingBottom: 5,
     marginVertical: 32
   },
   plants: {
-          flex: 1
+    flex: 1
   }
 })
 

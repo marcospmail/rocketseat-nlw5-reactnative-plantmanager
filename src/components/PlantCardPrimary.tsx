@@ -1,11 +1,11 @@
 import React from 'react';
-import { RectButton } from 'react-native-gesture-handler'
+import { RectButton, RectButtonProps } from 'react-native-gesture-handler'
 import { StyleSheet, View, Text } from 'react-native';
 import colors from '../styles/colors';
 import fonts from '../styles/fonts';
 import { SvgFromUri } from 'react-native-svg';
 
-interface PlantCardPrimaryProps {
+interface PlantCardPrimaryProps extends RectButtonProps {
   data: {
     name: string
     photo: string

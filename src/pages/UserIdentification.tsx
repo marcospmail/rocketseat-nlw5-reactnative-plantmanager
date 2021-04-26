@@ -1,6 +1,9 @@
 import { useNavigation } from '@react-navigation/core'
 import React, { useState } from 'react'
-import { SafeAreaView, StyleSheet, View, Text, TextInput, KeyboardAvoidingView, Platform } from 'react-native'
+import { SafeAreaView, StyleSheet, View, Text, TextInput, KeyboardAvoidingView, Platform, Alert } from 'react-native'
+
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
 import Button from '../components/Button'
 import colors from '../styles/colors'
 import fonts from '../styles/fonts'
@@ -10,6 +13,7 @@ function UserIdentification() {
 
   const [isFocused, setIsFocused] = useState(false)
   const [isFilled, setIsFilled] = useState(false)
+  const [userName, setUserName] = useState('')
 
   function handleInputBlur() {
     setIsFocused(false)
@@ -21,10 +25,24 @@ function UserIdentification() {
 
   function handleInputChange(value: string) {
     setIsFilled(!!value)
+    setUserName(value)
   }
 
   const navigateToConfirmationScreen = () => {
-    navigation.navigate('Confirmation')
+    if (!userName) {
+      Alert.alert('Preencha seu nome')
+      return
+    } 
+
+    AsyncStorage.setItem('@plantmanager:username', userName)
+
+    navigation.navigate('Confirmation', {
+      title: 'Prontinho',
+      subTitle: 'Agora vamos começar a cuidar das suas plantas',
+      buttonTitle: 'Começar',
+      icon: 'smile',
+      nextScreen: 'PlantSelection'
+    })
   }
 
   return (
