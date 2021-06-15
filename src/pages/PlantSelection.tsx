@@ -35,6 +35,7 @@ function PlantSelection() {
   useEffect(() => {
     async function fetchEnvironment() {
       const { data } = await api.get<EnvinromentProps[]>('plants_environments?_sort=title&_order=asc')
+
       setEnvironments([
         {
           key: 'all',
